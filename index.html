@@ -3,8 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danmu API Status Monitor</title>
+    <title>弹幕API状态监控</title>
     <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --bg-card-hover: rgba(255, 255, 255, 0.08);
+            --text-primary: #f5f5f7;
+            --text-secondary: #86868b;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-color: #0071e3;
+            --success-color: #30d158;
+            --error-color: #ff3b30;
+            --warning-color: #ff9500;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f5f5f7;
+            --bg-secondary: #ffffff;
+            --bg-card: rgba(0, 0, 0, 0.03);
+            --bg-card-hover: rgba(0, 0, 0, 0.06);
+            --text-primary: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --accent-color: #0071e3;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --warning-color: #ff9500;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,45 +42,69 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            color: #f5f5f7;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
-            padding: 40px 20px;
-            overflow-x: hidden;
+            padding: 30px 20px;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 40px;
-            animation: fadeInDown 0.8s ease;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
         .logo {
-            font-size: 48px;
+            font-size: 32px;
             font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            letter-spacing: -1px;
+            color: var(--accent-color);
+            flex: 1;
+            text-align: center;
+        }
+
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-card-hover);
+            transform: scale(1.05);
         }
 
         .version {
             display: inline-block;
-            background: rgba(102, 126, 234, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            color: #667eea;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--accent-color);
             padding: 6px 16px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: 500;
-            margin-top: 10px;
         }
 
         .status-indicator {
@@ -58,87 +112,90 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         .status-dot {
-            width: 10px;
-            height: 10px;
-            background: #30d158;
+            width: 8px;
+            height: 8px;
+            background: var(--warning-color);
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
 
+        .status-dot.success {
+            background: var(--success-color);
+        }
+
         .status-dot.error {
-            background: #ff3b30;
+            background: var(--error-color);
             animation: none;
         }
 
-        .status-dot.loading {
-            background: #ff9500;
-        }
-
         .status-text {
-            color: #86868b;
+            color: var(--text-secondary);
             font-size: 14px;
         }
 
-        .api-config {
-            background: rgba(255, 255, 255, 0.05);
+        .card {
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 20px;
-            animation: fadeInUp 0.8s ease;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease;
         }
 
-        .api-config-title {
-            font-size: 20px;
+        .card:hover {
+            background: var(--bg-card-hover);
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .card-title {
+            font-size: 18px;
             font-weight: 600;
-            margin-bottom: 20px;
-            color: #f5f5f7;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .input-group {
             display: flex;
             gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .input-wrapper {
-            flex: 1;
-            position: relative;
+            margin-bottom: 12px;
         }
 
         .api-input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #f5f5f7;
-            padding: 15px 20px;
-            border-radius: 12px;
+            flex: 1;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: 10px;
             font-size: 14px;
             transition: all 0.3s ease;
-            font-family: 'SF Mono', 'Monaco', monospace;
         }
 
         .api-input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
         }
 
         .api-input::placeholder {
-            color: #86868b;
+            color: var(--text-secondary);
         }
 
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--accent-color);
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 12px;
+            padding: 12px 24px;
+            border-radius: 10px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -147,8 +204,8 @@
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
 
         .btn:active {
@@ -161,164 +218,95 @@
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
 
         .hint {
-            color: #86868b;
+            color: var(--text-secondary);
             font-size: 12px;
-            margin-top: 10px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-            animation: fadeInUp 0.8s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(102, 126, 234, 0.3);
-            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
-        }
-
-        .card-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #f5f5f7;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-icon {
-            font-size: 20px;
+            margin-top: 8px;
         }
 
         .env-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
         }
 
         .env-item {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
             transition: all 0.2s ease;
         }
 
         .env-item:hover {
-            background: rgba(0, 0, 0, 0.4);
-            border-color: rgba(102, 126, 234, 0.2);
+            border-color: var(--accent-color);
         }
 
         .env-key {
-            font-size: 12px;
-            color: #86868b;
+            font-size: 11px;
+            color: var(--text-secondary);
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         .env-value {
-            font-size: 14px;
-            color: #f5f5f7;
+            font-size: 13px;
+            color: var(--text-primary);
             font-weight: 500;
             word-break: break-all;
         }
 
         .env-value.masked {
-            color: #667eea;
+            color: var(--accent-color);
             font-family: 'SF Mono', monospace;
         }
 
         .env-value.boolean-true {
-            color: #30d158;
+            color: var(--success-color);
         }
 
         .env-value.boolean-false {
-            color: #ff3b30;
+            color: var(--error-color);
         }
 
         .info-text {
-            color: #86868b;
+            color: var(--text-secondary);
             font-size: 14px;
-            line-height: 1.8;
+            line-height: 1.6;
             margin-bottom: 10px;
         }
 
         .info-label {
-            color: #f5f5f7;
+            color: var(--text-primary);
             font-weight: 600;
         }
 
         .link {
-            color: #667eea;
+            color: var(--accent-color);
             text-decoration: none;
-            transition: color 0.2s ease;
             word-break: break-all;
         }
 
         .link:hover {
-            color: #764ba2;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 60px;
-            color: #86868b;
-            font-size: 12px;
-        }
-
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(102, 126, 234, 0.3);
-            border-top-color: #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+            text-decoration: underline;
         }
 
         .error-message {
             background: rgba(255, 59, 48, 0.1);
-            border: 1px solid rgba(255, 59, 48, 0.3);
-            color: #ff3b30;
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
             display: none;
+            font-size: 14px;
         }
 
         .error-message.active {
@@ -328,19 +316,36 @@
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: #86868b;
+            color: var(--text-secondary);
         }
 
         .empty-icon {
             font-size: 48px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             opacity: 0.5;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes fadeInDown {
             from {
                 opacity: 0;
-                transform: translateY(-30px);
+                transform: translateY(-20px);
             }
             to {
                 opacity: 1;
@@ -351,7 +356,7 @@
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -362,11 +367,9 @@
         @keyframes pulse {
             0%, 100% {
                 opacity: 1;
-                box-shadow: 0 0 10px #30d158;
             }
             50% {
-                opacity: 0.6;
-                box-shadow: 0 0 20px #30d158;
+                opacity: 0.5;
             }
         }
 
@@ -376,53 +379,57 @@
 
         @media (max-width: 768px) {
             .logo {
-                font-size: 36px;
+                font-size: 24px;
+            }
+            .input-group {
+                flex-direction: column;
             }
             .env-grid {
                 grid-template-columns: 1fr;
             }
-            .input-group {
+            .header-top {
                 flex-direction: column;
+                gap: 15px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-    </div>
-
     <div class="container">
         <div class="header">
-            <div class="logo">Danmu API Monitor</div>
-            <div class="version" id="version">Not Connected</div>
+            <div class="header-top">
+                <div style="width: 44px;"></div>
+                <div class="logo">弹幕API监控</div>
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换主题">
+                    🌙
+                </button>
+            </div>
+            <div class="version" id="version">未连接</div>
             <div class="status-indicator">
-                <div class="status-dot loading" id="statusDot"></div>
-                <div class="status-text" id="statusMessage">Ready to connect</div>
+                <div class="status-dot" id="statusDot"></div>
+                <div class="status-text" id="statusMessage">准备就绪</div>
             </div>
         </div>
 
-        <div class="api-config">
-            <div class="api-config-title">⚙️ API Configuration</div>
+        <div class="card">
+            <div class="card-title">⚙️ API配置</div>
             <div class="input-group">
-                <div class="input-wrapper">
-                    <input 
-                        type="text" 
-                        class="api-input" 
-                        id="apiUrl" 
-                        placeholder="https://your-api-domain.com/api/status"
-                        autocomplete="off"
-                    />
-                </div>
+                <input 
+                    type="text" 
+                    class="api-input" 
+                    id="apiUrl" 
+                    placeholder="请输入API地址，例如：https://your-api.com/"
+                    autocomplete="off"
+                />
                 <button class="btn" id="loadBtn" onclick="loadAPIStatus()">
-                    🔄 Load Status
+                    加载状态
                 </button>
-                <button class="btn btn-secondary" id="clearBtn" onclick="clearData()">
-                    🗑️ Clear
+                <button class="btn btn-secondary" onclick="clearData()">
+                    清除
                 </button>
             </div>
             <div class="hint">
-                💡 输入您的弹幕API状态接口地址，例如：https://danmu.example.com/ 或完整路径
+                💡 输入您的弹幕API状态接口地址并点击"加载状态"按钮
             </div>
         </div>
 
@@ -431,18 +438,40 @@
         <div id="contentArea">
             <div class="empty-state">
                 <div class="empty-icon">📡</div>
-                <p>请输入API地址并点击"Load Status"按钮</p>
+                <p>请输入API地址并点击"加载状态"按钮</p>
             </div>
         </div>
 
         <div class="footer">
-            Powered by Cloudflare Workers & Pages
+            基于 Cloudflare Workers & Pages 部署
         </div>
     </div>
 
     <script>
+        // Theme management
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('themeToggle');
+            icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+            icon.title = theme === 'dark' ? '切换到亮色模式' : '切换到暗色模式';
+        }
+
         // Load saved API URL on page load
         window.addEventListener('DOMContentLoaded', () => {
+            initTheme();
             const savedUrl = localStorage.getItem('danmu_api_url');
             if (savedUrl) {
                 document.getElementById('apiUrl').value = savedUrl;
@@ -456,14 +485,6 @@
                 loadAPIStatus();
             }
         });
-
-        function showLoading() {
-            document.getElementById('loadingOverlay').classList.add('active');
-        }
-
-        function hideLoading() {
-            document.getElementById('loadingOverlay').classList.remove('active');
-        }
 
         function showError(message) {
             const errorEl = document.getElementById('errorMessage');
@@ -483,45 +504,72 @@
         }
 
         async function loadAPIStatus() {
-            const apiUrl = document.getElementById('apiUrl').value.trim();
+            let apiUrl = document.getElementById('apiUrl').value.trim();
             
             if (!apiUrl) {
                 showError('请输入API地址');
                 return;
             }
 
+            // 确保URL格式正确
+            if (!apiUrl.startsWith('http://') && !apiUrl.startsWith('https://')) {
+                apiUrl = 'https://' + apiUrl;
+            }
+
+            // 移除末尾的斜杠
+            apiUrl = apiUrl.replace(/\/+$/, '');
+
             // Save to localStorage
             localStorage.setItem('danmu_api_url', apiUrl);
 
-            showLoading();
-            updateStatus('loading', 'Loading...');
+            const loadBtn = document.getElementById('loadBtn');
+            loadBtn.innerHTML = '<span class="loading"></span> 加载中...';
+            loadBtn.disabled = true;
+            updateStatus('', '连接中...');
 
             try {
+                console.log('正在请求:', apiUrl);
+                
                 const response = await fetch(apiUrl, {
                     method: 'GET',
                     headers: {
-                        'Accept': 'application/json'
-                    }
+                        'Accept': 'application/json',
+                    },
+                    mode: 'cors',
                 });
+
+                console.log('响应状态:', response.status);
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('响应不是JSON格式');
+                }
+
                 const data = await response.json();
+                console.log('API响应数据:', data);
+                
+                // 检查数据结构
+                if (!data || typeof data !== 'object') {
+                    throw new Error('无效的API响应数据');
+                }
                 
                 // Update UI
                 renderData(data);
-                updateStatus('', 'Connected');
-                document.getElementById('version').textContent = `v${data.version || 'Unknown'}`;
+                updateStatus('success', '已连接');
+                document.getElementById('version').textContent = `v${data.version || '未知'}`;
 
             } catch (error) {
-                console.error('Error loading API status:', error);
-                showError(`Failed to load: ${error.message}`);
-                updateStatus('error', 'Connection Failed');
+                console.error('加载API状态失败:', error);
+                showError(`加载失败: ${error.message}`);
+                updateStatus('error', '连接失败');
                 renderEmptyState();
             } finally {
-                hideLoading();
+                loadBtn.innerHTML = '加载状态';
+                loadBtn.disabled = false;
             }
         }
 
@@ -531,13 +579,10 @@
             let html = '';
 
             // Environment Variables Card
-            if (data.envs && Object.keys(data.envs).length > 0) {
+            if (data.envs && typeof data.envs === 'object' && Object.keys(data.envs).length > 0) {
                 html += `
                     <div class="card">
-                        <div class="card-title">
-                            <span class="card-icon">🔧</span>
-                            Environment Configuration
-                        </div>
+                        <div class="card-title">🔧 环境配置</div>
                         <div class="env-grid">
                             ${renderEnvVars(data.envs)}
                         </div>
@@ -546,19 +591,16 @@
             }
 
             // About Card
-            if (data.description || data.repository) {
+            if (data.message || data.description || data.repository) {
                 html += `
                     <div class="card">
-                        <div class="card-title">
-                            <span class="card-icon">ℹ️</span>
-                            About
-                        </div>
-                        ${data.message ? `<p class="info-text"><span class="info-label">Status:</span> ${data.message}</p>` : ''}
+                        <div class="card-title">ℹ️ 关于</div>
+                        ${data.message ? `<p class="info-text"><span class="info-label">状态：</span>${escapeHtml(data.message)}</p>` : ''}
                         ${data.description ? `<p class="info-text">${escapeHtml(data.description)}</p>` : ''}
                         ${data.repository ? `
                             <p class="info-text">
-                                <span class="info-label">Repository:</span> 
-                                <a class="link" href="${data.repository}" target="_blank">${data.repository}</a>
+                                <span class="info-label">仓库：</span> 
+                                <a class="link" href="${escapeHtml(data.repository)}" target="_blank">${escapeHtml(data.repository)}</a>
                             </p>
                         ` : ''}
                     </div>
@@ -569,16 +611,17 @@
             if (data.notice) {
                 html += `
                     <div class="card">
-                        <div class="card-title">
-                            <span class="card-icon">📢</span>
-                            Notice
-                        </div>
-                        <p class="info-text">${formatNotice(data.notice)}</p>
+                        <div class="card-title">📢 公告</div>
+                        <div class="info-text">${formatNotice(data.notice)}</div>
                     </div>
                 `;
             }
 
-            contentArea.innerHTML = html;
+            if (html) {
+                contentArea.innerHTML = html;
+            } else {
+                renderEmptyState();
+            }
         }
 
         function renderEnvVars(envs) {
@@ -587,17 +630,19 @@
                 let valueClass = 'env-value';
 
                 if (typeof value === 'boolean') {
-                    displayValue = value ? '✓ Enabled' : '✗ Disabled';
+                    displayValue = value ? '✓ 已启用' : '✗ 已禁用';
                     valueClass += value ? ' boolean-true' : ' boolean-false';
                 } else if (Array.isArray(value)) {
-                    displayValue = value。length > 0 ? value。join(', ') : 'Empty Array';
-                } else if (typeof value === 'string' && value.includes('*')) {
-                    displayValue = value;
-                    valueClass += ' masked';
+                    displayValue = value.length > 0 ? value.join(', ') : '空数组';
+                } else if (typeof value === 'string') {
+                    if (value。includes('*')) {
+                        valueClass += ' masked';
+                    }
+                    displayValue = value || '未设置';
                 } else if (typeof value === 'object' && value !== null) {
-                    displayValue = JSON。stringify(value， null, 2);
+                    displayValue = JSON.stringify(value, null, 2);
                 } else {
-                    displayValue = value !== null && value !== undefined ? String(value) : 'N/A';
+                    displayValue = value !== null && value !== undefined ? String(value) : '未设置';
                 }
 
                 return `
@@ -606,12 +651,14 @@
                         <div class="${valueClass}">${escapeHtml(String(displayValue))}</div>
                     </div>
                 `;
-            }).join('');
+            })。join('');
         }
 
         function formatNotice(notice) {
-            return escapeHtml(notice)。替换(
-                /\[(https?:\/\/[^\]]+)\]/g, 
+            // 转义HTML并转换链接
+            const escaped = escapeHtml(notice);
+            return escaped.替换(
+                /\[(https?:\/\/[^\]]+)\]/g， 
                 '<a class="link" href="$1" target="_blank">$1</a>'
             );
         }
@@ -628,6 +675,7 @@
                 <div class="empty-state">
                     <div class="empty-icon">❌</div>
                     <p>无法加载API数据，请检查地址是否正确</p>
+                    <p style="margin-top: 10px; font-size: 12px;">提示：API需要支持CORS跨域访问</p>
                 </div>
             `;
         }
@@ -636,8 +684,8 @@
             document.getElementById('apiUrl').value = '';
             localStorage.removeItem('danmu_api_url');
             renderEmptyState();
-            updateStatus('loading', 'Ready to connect');
-            document.getElementById('version').textContent = 'Not Connected';
+            updateStatus('', '准备就绪');
+            document.getElementById('version').textContent = '未连接';
         }
     </script>
 </body>
